@@ -21,20 +21,19 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.awt.event.ActionEvent;
 import java.awt.Font;
-import javax.swing.DropMode;
 import javax.swing.JScrollPane;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
 public class CadLivro extends JFrame {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -2522179588146196546L;
-	Livro livro = new Livro();
+	private Livro livro;
 	LivroDAO dao = new LivroDAO();
 	AutorDAO aDao = new AutorDAO();
 	Date data = new Date();
-	SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:MM");
+	SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+	String caracteres = "0987654321";
 
 	private JPanel contentPane;
 	private JTextField textNome;
@@ -42,12 +41,10 @@ public class CadLivro extends JFrame {
 	private JTextArea textResenha;
 	private JComboBox<String> comboBoxAutor;
 	private JTextField textCodigo;
+	private JButton btnAtualizar;
 
 	ArrayList<Autor> lista = new ArrayList<>();
 
-	/**
-	 * Launch the application.
-	 */
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -61,9 +58,18 @@ public class CadLivro extends JFrame {
 		});
 	}
 
-	/**
-	 * Create the frame.
-	 */
+	public boolean campoVazio() {
+		boolean vazio = true;
+		if (textNome.getText().equals("") || textAno.getText().equals("") || textResenha.getText().equals("")
+				|| comboBoxAutor.equals(-1)) {
+			vazio = true;
+		} else {
+			vazio = false;
+		}
+
+		return vazio;
+	}
+
 	public CadLivro() {
 		setResizable(false);
 		setTitle("Cadastrar livro");
@@ -77,6 +83,7 @@ public class CadLivro extends JFrame {
 		JLabel lblNome = new JLabel("Nome:");
 		lblNome.setBounds(165, 64, 52, 14);
 		contentPane.add(lblNome);
+		lblNome.setLabelFor(textNome);
 
 		textNome = new JTextField();
 		textNome.setBounds(211, 61, 345, 20);
@@ -86,6 +93,7 @@ public class CadLivro extends JFrame {
 		JLabel lblResenha = new JLabel("Resenha:");
 		lblResenha.setBounds(10, 147, 111, 14);
 		contentPane.add(lblResenha);
+		lblResenha.setLabelFor(textResenha);
 
 		JScrollPane scrollPane = new JScrollPane();
 		scrollPane.setBounds(10, 172, 394, 168);
@@ -94,70 +102,108 @@ public class CadLivro extends JFrame {
 		textResenha = new JTextArea();
 		scrollPane.setViewportView(textResenha);
 		textResenha.setTabSize(10);
-		textResenha.setDropMode(DropMode.ON);
 		textResenha.setLineWrap(true);
 
 		JLabel lblAno = new JLabel("Ano:");
 		lblAno.setBounds(10, 102, 46, 14);
 		contentPane.add(lblAno);
+		lblAno.setLabelFor(textAno);
 
 		textAno = new JTextField();
 		textAno.setBounds(52, 99, 86, 20);
 		contentPane.add(textAno);
 		textAno.setColumns(10);
+		textAno.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyTyped(KeyEvent evt) {
+				if (!caracteres.contains(evt.getKeyChar() + "")) {
+					evt.consume();
+				}
+				if (textAno.getText().length() > 3) {
+					evt.consume();
+				}
+			}
+		});
 
 		JLabel lblAutor = new JLabel("Autor:");
 		lblAutor.setBounds(165, 102, 46, 14);
 		contentPane.add(lblAutor);
+		lblAutor.setLabelFor(comboBoxAutor);
 
 		comboBoxAutor = new JComboBox<String>();
 		comboBoxAutor.setBounds(211, 99, 217, 20);
 		contentPane.add(comboBoxAutor);
-		// popular combobox de autores
+		// POPULAR COMBOBOX
 		lista.addAll(aDao.listar());
 		for (int i = 0; i < lista.size(); i++) {
-			comboBoxAutor.addItem(lista.get(i).getNome());
+			comboBoxAutor.addItem(lista.get(i).getNome() + " " + lista.get(i).getSobrenome());
 		}
 
+		// GRAVAR DADOS NO BANCO
 		JButton btnGravar = new JButton("Gravar");
 		btnGravar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				livro = new Livro();
+				//livro.setCod(Integer.parseInt(textCodigo.getText()));
 				livro.setNome(textNome.getText());
 				livro.setAno(textAno.getText());
 				livro.setResenha(textResenha.getText());
 				livro.setData_cadastro(data);
-				livro.setCod_autor(comboBoxAutor.getSelectedIndex());
-
-				dao.cadastar(livro);
-				JOptionPane.showMessageDialog(null, "cadastrado com sucesso");
+				livro.setCod_autor(comboBoxAutor.getSelectedIndex()+1);
+				if (campoVazio()) {
+					JOptionPane.showMessageDialog(null, "campo vazios!");
+				} else {
+					dao.cadastar(livro);
+					JOptionPane.showMessageDialog(null, "cadastrado com sucesso!");
+				}
 			}
 		});
-		btnGravar.setBounds(565, 376, 89, 23);
+
+		btnGravar.setBounds(10, 376, 89, 23);
 		contentPane.add(btnGravar);
 
 		JLabel lblData = new JLabel("Data " + df.format(data));
 		lblData.setBounds(10, 351, 263, 14);
 		contentPane.add(lblData);
 
+		// BUSCAR POR ID
 		JButton btnBuscar = new JButton("Buscar");
-		btnBuscar.setBounds(10, 376, 89, 23);
+		btnBuscar.setBounds(109, 376, 89, 23);
 		contentPane.add(btnBuscar);
 		btnBuscar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				int i = (Integer.parseInt(textCodigo.getText()));
-				livro = dao.buscar(i);
-				textNome.setText(livro.getNome());
-				textAno.setText(livro.getAno());
-				textResenha.setText(livro.getResenha());
-				comboBoxAutor.setSelectedIndex(livro.getCod_autor());
+				livro = new Livro();
+				livro.setCod(Integer.parseInt(textCodigo.getText()));
+				if (textCodigo.getText().equals("")) {
+					JOptionPane.showMessageDialog(null, "campo codigo vazio!");
+				} else {
+					if (dao.buscar(livro.getCod()) == null) {
+						JOptionPane.showMessageDialog(null, "Registro não existe!");
+					}
+					int i = (Integer.parseInt(textCodigo.getText()));
+					livro = dao.buscar(i);
+					textNome.setText(livro.getNome());
+					textAno.setText(livro.getAno());
+					textResenha.setText(livro.getResenha());
+					comboBoxAutor.setSelectedIndex(livro.getCod_autor()-1);
+				}
 			}
 		});
 
 		JLabel lblCodigo = new JLabel("Codigo");
 		lblCodigo.setBounds(10, 64, 59, 14);
 		contentPane.add(lblCodigo);
+		lblCodigo.setLabelFor(textCodigo);
 
 		textCodigo = new JTextField();
+		textCodigo.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyTyped(KeyEvent evt) {
+				if (!caracteres.contains(evt.getKeyChar() + "")) {
+					evt.consume();
+				}
+			}
+		});
 		textCodigo.setBounds(52, 61, 86, 20);
 		contentPane.add(textCodigo);
 		textCodigo.setColumns(10);
@@ -171,8 +217,9 @@ public class CadLivro extends JFrame {
 		lblCadastroEBusca.setBounds(23, 11, 465, 37);
 		contentPane.add(lblCadastroEBusca);
 
+		// LIMPAR CAMPOS
 		JButton btnLimpar = new JButton("Limpar");
-		btnLimpar.setBounds(454, 376, 89, 23);
+		btnLimpar.setBounds(551, 376, 89, 23);
 		contentPane.add(btnLimpar);
 		btnLimpar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -183,5 +230,49 @@ public class CadLivro extends JFrame {
 				textResenha.setText("");
 			}
 		});
+
+		JButton btnDeletar = new JButton("Deletar");
+		btnDeletar.setBounds(315, 376, 89, 23);
+		contentPane.add(btnDeletar);
+		btnDeletar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				livro = new Livro();
+				if (textCodigo.getText().equals("")) {
+					JOptionPane.showMessageDialog(null, "campo codigo vazio!");
+				} else {
+					livro.setCod(Integer.parseInt(textCodigo.getText()));
+					dao.deletar(livro);
+					JOptionPane.showMessageDialog(null, "Deletado com sucesso!");
+				}
+			}
+		});
+
+		btnAtualizar = new JButton("Atualizar");
+		btnAtualizar.setBounds(211, 376, 89, 23);
+		contentPane.add(btnAtualizar);
+		btnAtualizar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				livro.setCod(Integer.parseInt(textCodigo.getText()));
+				livro.setNome(textNome.getText());
+				livro.setAno(textAno.getText());
+				livro.setResenha(textResenha.getText());
+				livro.setData_cadastro(data);
+				livro.setCod_autor(comboBoxAutor.getSelectedIndex() + 1);
+
+				if (campoVazio()) {
+					JOptionPane.showMessageDialog(null, "Existem campos vazios!");
+				} else {
+
+					if (dao.buscar(livro.getCod()) != null) {
+						dao.atualizar(livro);
+						JOptionPane.showMessageDialog(null, "Atualizado com sucesso!");
+					} else {
+						JOptionPane.showMessageDialog(null, "Registro não existe!");
+					}
+
+				}
+			}
+		});
+
 	}
 }

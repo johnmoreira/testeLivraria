@@ -1,5 +1,6 @@
 package dao;
 
+import java.util.List;
 import entidades.Livro;
 
 public class LivroDAO {
@@ -14,15 +15,15 @@ public class LivroDAO {
 		return l;
 	}
 	
-	public void atualizar() {
-		new DAO<Livro>(Livro.class).atualizar(this.l);
+	public void atualizar(Livro l) {
+		new DAO<Livro>(Livro.class).atualizar(l);
 	}
 	
-	public void deletar() {
-		new DAO<Livro>(Livro.class).remover(this.l);
+	public void deletar(Livro l) {
+		new DAO<Livro>(Livro.class).remover(l);
 	}
 	
-	public void listar() {
-		new DAO<Livro>(Livro.class).listaTodos();
+	public  List<Livro> listar() {
+		return new DAO<Livro>(Livro.class).listaTodos();
 	}
 }

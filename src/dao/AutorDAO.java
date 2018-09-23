@@ -19,8 +19,8 @@ public class AutorDAO {
 		new DAO<Autor>(Autor.class).atualizar(this.a);
 	}
 	
-	public void deletar() {
-		new DAO<Autor>(Autor.class).remover(this.a);
+	public void deletar(Autor a) {
+		new DAO<Autor>(Autor.class).remover(a);
 	}
 	
 	public List<Autor> listar() {

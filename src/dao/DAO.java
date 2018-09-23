@@ -30,8 +30,8 @@ public class DAO<T> {
 		EntityManager em = new JPAUtil().getEntityManager();
 		try {
 			em.getTransaction().begin();
-			// objeto = em.find(Object.class, cod);
-			// em.remove(objeto);
+			//objeto = em.find(Object.class, cod);
+			//em.remove(objeto);
 			em.remove(em.merge(t));
 			em.getTransaction().commit();
 		} catch (Exception ex) {
