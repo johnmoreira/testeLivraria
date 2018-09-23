@@ -51,6 +51,8 @@ public class DAO<T> {
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			em.getTransaction().rollback();
+		} finally {
+			em.close();
 		}
 	}
 
