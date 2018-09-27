@@ -9,21 +9,26 @@ public class LivroDAO {
 	public void cadastar(Livro l) {
 		new DAO<Livro>(Livro.class).adicionar(l);
 	}
-	
-	public Livro buscar(int i) {
-		l =new DAO<Livro>(Livro.class).buscaPorId(i);
+
+	public Livro buscarPorId(int id) {
+		l = new DAO<Livro>(Livro.class).buscaPorId(id);
 		return l;
 	}
-	
+
+	public Livro buscarPorNome(String nome) {
+		l = new DAO<Livro>(Livro.class).buscaPorNome(nome);
+		return l;
+	}
+
 	public void atualizar(Livro l) {
 		new DAO<Livro>(Livro.class).atualizar(l);
 	}
-	
+
 	public void deletar(Livro l) {
 		new DAO<Livro>(Livro.class).remover(l);
 	}
-	
-	public  List<Livro> listar() {
+
+	public List<Livro> listar() {
 		return new DAO<Livro>(Livro.class).listaTodos();
 	}
 }

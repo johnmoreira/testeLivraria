@@ -1,11 +1,12 @@
 package entidades;
 
 import java.util.Date;
-
+import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 
 @Entity
 public class Livro {
@@ -13,12 +14,35 @@ public class Livro {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int cod;
+
 	private String nome;
+
 	private String ano;
+
 	private String resenha;
+
 	private Date data_cadastro;
-	private int cod_autor;
-	//private int cod_nota;
+
+	@ManyToOne
+	private Autor autor;
+
+	private Byte[] imagem;
+
+	// private List<Nota> nota;
+
+	public Livro() {
+	}
+
+	public Livro(int cod, String nome, String ano, String resenha, Date data_cadastro, Autor autor, Byte[] imagem) {
+		super();
+		this.cod = cod;
+		this.nome = nome;
+		this.ano = ano;
+		this.resenha = resenha;
+		this.data_cadastro = data_cadastro;
+		this.autor = autor;
+		this.imagem = imagem;
+	}
 
 	public int getCod() {
 		return cod;
@@ -60,19 +84,19 @@ public class Livro {
 		this.data_cadastro = data_cadastro;
 	}
 
-	public int getCod_autor() {
-		return cod_autor;
+	public Autor getAutor() {
+		return autor;
 	}
 
-	public void setCod_autor(int cod_autor) {
-		this.cod_autor = cod_autor;
+	public void setAutor(Autor autor) {
+		this.autor = autor;
 	}
 
-/*	public int getCod_nota() {
-		return cod_nota;
+	public Byte[] getImagem() {
+		return imagem;
 	}
 
-	public void setCod_nota(int cod_nota) {
-		this.cod_nota = cod_nota;
-	} */
+	public void setImagem(Byte[] imagem) {
+		this.imagem = imagem;
+	}
 }

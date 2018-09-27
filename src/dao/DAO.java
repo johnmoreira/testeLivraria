@@ -30,8 +30,8 @@ public class DAO<T> {
 		EntityManager em = new JPAUtil().getEntityManager();
 		try {
 			em.getTransaction().begin();
-			//objeto = em.find(Object.class, cod);
-			//em.remove(objeto);
+			// objeto = em.find(Object.class, cod);
+			// em.remove(objeto);
 			em.remove(em.merge(t));
 			em.getTransaction().commit();
 		} catch (Exception ex) {
@@ -70,6 +70,13 @@ public class DAO<T> {
 	public T buscaPorId(Integer id) {
 		EntityManager em = new JPAUtil().getEntityManager();
 		T instancia = em.find(classe, id);
+		em.close();
+		return instancia;
+	}
+
+	public T buscaPorNome(String nome) {
+		EntityManager em = new JPAUtil().getEntityManager();
+		T instancia = em.find(classe, nome);
 		em.close();
 		return instancia;
 	}

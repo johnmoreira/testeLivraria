@@ -1,18 +1,26 @@
 package entidades;
 
+import java.util.List;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 
 @Entity
 public class Autor {
-	
+
 	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int cod;
+
 	private String nome;
+
 	private String sobrenome;
+
+	@OneToMany
+	private List<Livro> livro;
 
 	public int getCod() {
 		return cod;
@@ -37,4 +45,19 @@ public class Autor {
 	public void setSobrenome(String sobrenome) {
 		this.sobrenome = sobrenome;
 	}
+
+	public List<Livro> getLivro() {
+		return livro;
+	}
+
+	public void setLivro(List<Livro> livro) {
+		this.livro = livro;
+	}
+
+	@Override
+	public String toString() {
+		return cod + " - " + nome + " " + sobrenome;
+	}
+	
+	
 }

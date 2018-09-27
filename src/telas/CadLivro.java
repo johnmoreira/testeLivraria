@@ -39,7 +39,7 @@ public class CadLivro extends JFrame {
 	private JTextField textNome;
 	private JTextField textAno;
 	private JTextArea textResenha;
-	private JComboBox<String> comboBoxAutor;
+	private JComboBox<Autor> comboBoxAutor;
 	private JTextField textCodigo;
 	private JButton btnAtualizar;
 
@@ -71,6 +71,8 @@ public class CadLivro extends JFrame {
 	}
 
 	public CadLivro() {
+		lista.addAll(aDao.listar());
+
 		setResizable(false);
 		setTitle("Cadastrar livro");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -129,27 +131,26 @@ public class CadLivro extends JFrame {
 		lblAutor.setBounds(165, 102, 46, 14);
 		contentPane.add(lblAutor);
 		lblAutor.setLabelFor(comboBoxAutor);
-
-		comboBoxAutor = new JComboBox<String>();
+		comboBoxAutor = new JComboBox<Autor>();
 		comboBoxAutor.setBounds(211, 99, 217, 20);
 		contentPane.add(comboBoxAutor);
 		// POPULAR COMBOBOX
-		lista.addAll(aDao.listar());
-		for (int i = 0; i < lista.size(); i++) {
-			comboBoxAutor.addItem(lista.get(i).getNome() + " " + lista.get(i).getSobrenome());
-		}
+		for (Autor a : lista)
+			comboBoxAutor.addItem(a);
 
 		// GRAVAR DADOS NO BANCO
 		JButton btnGravar = new JButton("Gravar");
+		btnGravar.setBounds(10, 376, 89, 23);
+		contentPane.add(btnGravar);
 		btnGravar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				livro = new Livro();
-				//livro.setCod(Integer.parseInt(textCodigo.getText()));
+				livro.setCod(Integer.parseInt(textCodigo.getText()));
 				livro.setNome(textNome.getText());
 				livro.setAno(textAno.getText());
 				livro.setResenha(textResenha.getText());
 				livro.setData_cadastro(data);
-				livro.setCod_autor(comboBoxAutor.getSelectedIndex()+1);
+				livro.setAutor(comboBoxAutor.getItemAt(comboBoxAutor.getSelectedIndex()));
 				if (campoVazio()) {
 					JOptionPane.showMessageDialog(null, "campo vazios!");
 				} else {
@@ -158,9 +159,6 @@ public class CadLivro extends JFrame {
 				}
 			}
 		});
-
-		btnGravar.setBounds(10, 376, 89, 23);
-		contentPane.add(btnGravar);
 
 		JLabel lblData = new JLabel("Data " + df.format(data));
 		lblData.setBounds(10, 351, 263, 14);
@@ -177,15 +175,15 @@ public class CadLivro extends JFrame {
 				if (textCodigo.getText().equals("")) {
 					JOptionPane.showMessageDialog(null, "campo codigo vazio!");
 				} else {
-					if (dao.buscar(livro.getCod()) == null) {
+					if (dao.buscarPorId(livro.getCod()) == null) {
 						JOptionPane.showMessageDialog(null, "Registro não existe!");
 					}
 					int i = (Integer.parseInt(textCodigo.getText()));
-					livro = dao.buscar(i);
+					livro = dao.buscarPorId(i);
 					textNome.setText(livro.getNome());
 					textAno.setText(livro.getAno());
 					textResenha.setText(livro.getResenha());
-					comboBoxAutor.setSelectedIndex(livro.getCod_autor()-1);
+					comboBoxAutor.getModel().setSelectedItem(livro.getAutor());
 				}
 			}
 		});
@@ -257,13 +255,13 @@ public class CadLivro extends JFrame {
 				livro.setAno(textAno.getText());
 				livro.setResenha(textResenha.getText());
 				livro.setData_cadastro(data);
-				livro.setCod_autor(comboBoxAutor.getSelectedIndex() + 1);
+				livro.setAutor(comboBoxAutor.getItemAt(comboBoxAutor.getSelectedIndex()));
 
 				if (campoVazio()) {
 					JOptionPane.showMessageDialog(null, "Existem campos vazios!");
 				} else {
 
-					if (dao.buscar(livro.getCod()) != null) {
+					if (dao.buscarPorId(livro.getCod()) != null) {
 						dao.atualizar(livro);
 						JOptionPane.showMessageDialog(null, "Atualizado com sucesso!");
 					} else {
